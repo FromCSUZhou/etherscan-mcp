@@ -22,11 +22,17 @@ export function registerRpcTools(server: FastMCP) {
     description: "Returns information about a block by block number.",
     parameters: z.object({
       tag: z.string().describe("the block number, in hex eg. `0xC36B3C`"),
-      boolean: z.string().describe("the `boolean` value to show full transaction objects. when `true`, returns full transaction objects and their information, when `false` only returns a list of transactions."),
+      boolean: z.boolean().describe("when `true`, returns full transaction objects and their information, when `false` only returns a list of transactions."),
       chainid: z.string().optional().default("1").describe("chain id, default 1 ( Ethereum )"),
     }),
     execute: async (params) => {
-      const fullParams = { ...params, module: "proxy", action: "eth_getBlockByNumber" };
+      // Convert boolean to string as required by Etherscan API
+      const fullParams = { 
+        ...params, 
+        boolean: params.boolean.toString(), 
+        module: "proxy", 
+        action: "eth_getBlockByNumber" 
+      };
       return await apiCall(fullParams);
     }
   });
